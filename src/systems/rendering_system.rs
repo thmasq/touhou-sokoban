@@ -1,14 +1,12 @@
 
 
-
 use crate::components::*;
-use crate::resources::*;
 use crate::constants::TILE_WIDTH;
+use crate::resources::*;
 
 use ggez::{Context, graphics::{self, DrawParam, Image, Color}};
 use specs::{Join, ReadStorage, System, Read};
 use glam::Vec2;
-
 
 use std::time::Duration;
 
