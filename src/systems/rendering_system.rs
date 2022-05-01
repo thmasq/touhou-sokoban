@@ -54,6 +54,8 @@ impl RenderingSystem<'_> {
 }
 
 // System implementation
+
+// 'a is a lifetime annotation which prevents the value from being dropped after it it out of scope. It is necessary in this case
 impl<'a> System<'a> for RenderingSystem<'a> {
     // Data
     type SystemData = (
