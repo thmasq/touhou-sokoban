@@ -81,14 +81,14 @@ impl event::EventHandler<ggez::GameError> for Game {
 // Initialize the level
 pub fn initialize_level(world: &mut World) {
     const MAP: &str = "
-    N N W W W W W W
-    W W W . . . . W
-    W . . . BB . . W
-    W . . RB . . . W 
-    W . P . . . . W
-    W . . . . RS . W
-    W . . BS . . . W
-    W . . . . . . W
+    N N W W W W W N
+    W W W . . . W N
+    W BS P BB . . W N
+    W W W . BB BS W N 
+    W BS W W BB . W N
+    W . W . BS . W W
+    W BB BB BS BB BB BS W
+    W . . . BS . . W
     W W W W W W W W
     ";
 
