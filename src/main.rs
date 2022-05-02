@@ -104,7 +104,7 @@ pub fn main() -> GameResult {
     // Create a game context and event loop
     let context_builder = ggez::ContextBuilder::new("touhou_sokoban", "sokoban")
         .window_setup(conf::WindowSetup::default().title("Touhou Sokoban!"))
-        .window_mode(conf::WindowMode::default().dimensions(800.0, 600.0))
+        .window_mode(conf::WindowMode::default().dimensions(1920.0, 1080.0))
         .add_resource_path(path::PathBuf::from("./resources"));
 
     let (mut context, event_loop) = context_builder.build()?;
