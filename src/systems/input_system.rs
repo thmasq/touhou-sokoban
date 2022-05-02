@@ -57,6 +57,10 @@ impl<'a> System<'a> for InputSystem {
                     KeyCode::Down => (position.y, MAP_HEIGHT, false),
                     KeyCode::Left => (position.x, 0, true),
                     KeyCode::Right => (position.x, MAP_WIDTH, true),
+                    KeyCode::W => (position.y, 0, false),
+                    KeyCode::S => (position.y, MAP_HEIGHT, false),
+                    KeyCode::A => (position.x, 0, true),
+                    KeyCode::D => (position.x, MAP_WIDTH, true),
                     _ => continue,
                 };
 
@@ -109,6 +113,10 @@ impl<'a> System<'a> for InputSystem {
                     KeyCode::Down => position.y += 1,
                     KeyCode::Left => position.x -= 1,
                     KeyCode::Right => position.x += 1,
+                    KeyCode::W => position.y -= 1,
+                    KeyCode::S => position.y += 1,
+                    KeyCode::A => position.x -= 1,
+                    KeyCode::D => position.x += 1,
                     _ => (),
                 }
             }
