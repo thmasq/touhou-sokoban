@@ -23,6 +23,10 @@ impl InputSystem {
             KeyCode::Down => ((player_pos.y..=MAP_HEIGHT).collect::<Vec<_>>(), false),
             KeyCode::Left => ((0..=player_pos.x).rev().collect::<Vec<_>>(), true),
             KeyCode::Right => ((player_pos.x..=MAP_WIDTH).collect::<Vec<_>>(), true),
+            KeyCode::W => ((0..=player_pos.y).rev().collect::<Vec<_>>(), false),
+            KeyCode::S => ((player_pos.y..=MAP_HEIGHT).collect::<Vec<_>>(), false),
+            KeyCode::A => ((0..=player_pos.x).rev().collect::<Vec<_>>(), true),
+            KeyCode::D => ((player_pos.x..=MAP_WIDTH).collect::<Vec<_>>(), true),
             _ => return None
         };
 
@@ -75,6 +79,10 @@ impl<'a> System<'a> for InputSystem {
                     KeyCode::Down => Direction::Down,
                     KeyCode::Left => Direction::Left,
                     KeyCode::Right => Direction::Right,
+                    KeyCode::W => Direction::Up,
+                    KeyCode::S => Direction::Down,
+                    KeyCode::A => Direction::Left,
+                    KeyCode::D => Direction::Right,
                     _ => player_direction.direction
                 }
             }
@@ -103,6 +111,10 @@ impl<'a> System<'a> for InputSystem {
                         KeyCode::Down => renderable.position.y += 1,
                         KeyCode::Left => renderable.position.x -= 1,
                         KeyCode::Right => renderable.position.x += 1,
+                        KeyCode::W => renderable.position.y -= 1,
+                        KeyCode::S => renderable.position.y += 1,
+                        KeyCode::A => renderable.position.x -= 1,
+                        KeyCode::D => renderable.position.x += 1,
                         _ => ()
                     }
                 }
