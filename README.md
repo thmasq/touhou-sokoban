@@ -30,7 +30,7 @@ You need rust and cargo installed to compile the game. It can be compiled by run
 
 #### Olivia 
 
-I would like to thank Olivia Ifrim for her comprehensive guide on how to use the ggez game engine. It clarified and helped me learn how to use it, and why each function, method, enum or macro was being used. Do check out her repo on that. Her code examples and books are very comprehensive. https://github.com/iolivia/rust-sokoban 
+I would like to thank Olivia Ifrim for her comprehensive guide on how to use the ggez game engine. It clarified and helped me learn how to use it, and why each function, method, enum or macro was being used. Do check out her repo on that. Her code examples and books are very nice. https://github.com/iolivia/rust-sokoban 
 
 #### Thanh and Ly Nguyen 
 
