@@ -5,3 +5,5 @@ Cargo.lock
 touhou-sokoban
 touhou-sokoban.d
 touhou-sokoban.exe
+resources/box_black.png
+resources/spot_black.png
