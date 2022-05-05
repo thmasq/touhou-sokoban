@@ -34,7 +34,7 @@ I would like to thank Olivia Ifrim for her comprehensive guide on how to use the
 
 #### Thanh and Ly Nguyen 
 
-I would also like to thank Thanh Nguyen and Ly Nguyen for sharing their source code that went in the same direction as Olivia's project, but implemented more features. I am a beginner both in Rust and in programming, so reading their code was essential for me to understand how features such as refreshing the map or reading the map files from a .json files are implemented. It can be considered the code base of this project, and I do intend to maintain it. Do check out their project: https://github.com/thanhqng1510/sokoban-rust 
+I would also like to thank Thanh Nguyen and Ly Nguyen for sharing their source code that went in the same direction as Olivia's project, but implemented more features. I am a beginner both in Rust and in programming, so reading their code was essential for me to understand how features such as refreshing the map or reading the map files from a .json files are implemented. It can be considered the code base for this project, and I do intend to maintain it. Do check out their project: https://github.com/thanhqng1510/sokoban-rust 
 
 #### Kazuki Kazuma 
 
