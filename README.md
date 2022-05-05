@@ -11,7 +11,7 @@ This version of the ggez engine has a bug that will intantly crash the game when
 ##### How to run
 Download the source code from the releases or from the repo itself if you want to run it on the bleeding edge. Paste the linux elf binary inside the folder and run it. The binary must be in the root of the folder containing the data and resources folders. You may delete the others if you aren't interested in compiling the code yourself. Inside the data folder there is a file named game_data.json. It changes what level the game is going to load when it is ran. Currently only level 1 and 2 are populated.
 #### Compiling it yourself
-You need rust and cargo installed in order to compile the game. It can be compiled by running the command cargo build updated, and it will be compiled to ./target/release/ . If you want to cross compile it on Linux this might help https://wiki.archlinux.org/title/Rust#Windows
+You need rust and cargo installed in order to compile the game. It can be compiled by running the command "cargo build --release", and it will be compiled to ./target/release/ . If you want to cross compile it on Linux this might help https://wiki.archlinux.org/title/Rust#Windows
 # Credits
 #### Olivia
 I would like to thank Olivia Ifrim for her comprehensive guide on how to use the ggez game engine. It clarified and helped me learn how to use it, and why each function, method, enum or macro was being used. Do check out her repo on that. Her code examples and books are very comprehensive. https://github.com/iolivia/rust-sokoban
