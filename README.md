@@ -1,5 +1,5 @@
 # Touhou Sokoban!
-  This is a small project that I decided to make on my own to learn how to use the Rust programming language on a real release for people to enjoy. I folowed some tutorials on the ggez game engine and forked some projects that were already using it correctly and this helped me learn quite a lot.
+  This is a small project that I decided to make on my own to learn how to use the Rust programming language on a real release for people to enjoy. I followed some tutorials on the ggez game engine and forked some projects that were already using it correctly and this helped me learn quite a lot.
   I intend to keep working on this project and update the old dependencies to their newest version soon™. The codebase will likely change a bit when the dependencies are updated, and some assets will be changed when I have enough knowledge to implement them correctly.
   
 # Instructions and how to run
