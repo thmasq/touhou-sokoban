@@ -1,51 +1,77 @@
-use specs::{Join, ReadStorage, System, Write};
-use std::collections::HashMap;
+use specs::{System, ReadStorage, Join, WriteExpect, ReadExpect};
+use ggez::audio::SoundSource;
+use crate::resources::game_state::{GameState, GameplayState};
+use crate::resources::sound_library::SoundLibrary;
+use crate::resources::level_data::LevelData;
+use crate::components::{Box, Spot, Renderable};
+use std::collections::{HashSet, HashMap};
 
-use crate::{
-    components::{Box, BoxSpot, Position},
-    resources::{Gameplay, GameplayState},
-};
 
-pub struct GameplayStateSystem {}
+pub struct GameplayStateSystem;
+
+impl GameplayStateSystem {
+    pub fn new() -> Self {
+        GameplayStateSystem {}
+    }
+}
 
 impl<'a> System<'a> for GameplayStateSystem {
-    // Data
     type SystemData = (
-        Write<'a, Gameplay>,
-        ReadStorage<'a, Position>,
+        WriteExpect<'a, GameState>,
+        WriteExpect<'a, SoundLibrary>,
+        ReadExpect<'a, LevelData>,
         ReadStorage<'a, Box>,
-        ReadStorage<'a, BoxSpot>,
+        ReadStorage<'a, Spot>,
+        ReadStorage<'a, Renderable>
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut gameplay_state, positions, boxes, box_spots) = data;
+        let (mut game_state,
+            mut sound_lib,
+            level_data,
+            boxes,
+            spots,
+            renderables) = data;
 
-        // get all boxes indexed by position
-        let boxes_by_position: HashMap<(u8, u8), &Box> = (&positions, &boxes)
-            .join()
-            .map(|t| ((t.0.x, t.0.y), t.1))
-            .collect::<HashMap<_, _>>();
+        if game_state.gameplay_state != GameplayState::Won {
+            if let Some(ref mut ingame_music) = sound_lib.music_sound.ingame_music {
+                if ingame_music.stopped() { ingame_music.play().unwrap(); }
+            }
 
-        // loop through all box spots and check if there is a corresponding
-        // box at that position. since we now have different types of boxes
-        // we need to make sure the right type of box is on the right
-        // type of spot.
-        for (box_spot, position) in (&box_spots, &positions).join() {
-            if let Some(the_box) = boxes_by_position.get(&(position.x, position.y)) {
-                if the_box.colour == box_spot.colour {
-                    // continue
-                } else {
-                    // return, haven't won yet
-                    return;
+            if level_data.box_spot_identical_mode == true {
+                let spot_positions = (&spots, &renderables).join()
+                    .map(|(_, renderable)| ((renderable.position.x, renderable.position.y), &renderable.resource_template_data["spot_color"]))
+                    .collect::<HashMap<_, _>>();
+
+                for (_, renderable) in (&boxes, &renderables).join() {
+                    if !spot_positions.contains_key(&(renderable.position.x, renderable.position.y)) ||
+                        spot_positions[&(renderable.position.x, renderable.position.y)] != &renderable.resource_template_data["box_color"] {
+                        game_state.gameplay_state = GameplayState::Playing;
+                        return;
+                    }
                 }
-            } else {
-                gameplay_state.state = GameplayState::Playing;
-                return;
+            }
+            else {
+                let spot_positions = (&spots, &renderables).join()
+                    .map(|(_, renderable)| (renderable.position.x, renderable.position.y))
+                    .collect::<HashSet<_>>();
+
+                for (_, renderable) in (&boxes, &renderables).join() {
+                    if !spot_positions.contains(&(renderable.position.x, renderable.position.y)) {
+                        game_state.gameplay_state = GameplayState::Playing;
+                        return;
+                    }
+                }
+            }
+
+            game_state.gameplay_state = GameplayState::Won;
+            if let Some(ref mut ingame_music) = sound_lib.music_sound.ingame_music {
+                if ingame_music.playing() { ingame_music.stop(); }
             }
         }
 
-        // If we made it this far, then all box spots have boxes on them, and the
-        // game has been won
-        gameplay_state.state = GameplayState::Won;
+        if let Some(ref mut victory_music) = sound_lib.music_sound.victory_music {
+            if victory_music.stopped() { victory_music.play().unwrap(); }
+        }
     }
 }

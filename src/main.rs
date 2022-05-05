@@ -1,117 +1,40 @@
-// Touhou Sokoban
-// main.rs
+use std::{path, fs};
 
-use ggez::{conf, event::{self, KeyCode, KeyMods}, timer, Context, GameResult};
-use specs::{RunNow, World, WorldExt};
+use ggez::{conf, event, GameResult};
+use specs::{World, WorldExt};
 
-use std::path;
+use crate::game_context::GameContext;
+use crate::constant::{AUTHOR, GAME_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, RESOURCE_PREFIX_PATH, SETTING_PATH, GAME_DATA_PATH};
+use serde_json::Value;
 
-mod audio;
 mod components;
-mod constants;
-mod entities;
-mod events;
-mod map;
-mod resources;
+mod entity_builder;
 mod systems;
+mod game_context;
+mod resources;
+mod constant;
 
-use crate::audio::*;
-use crate::components::*;
-use crate::map::*;
-use crate::resources::*;
-use crate::systems::*;
 
-struct Game {
-    world: World,
-}
+fn main() -> GameResult {
+    let s= fs::read_to_string(SETTING_PATH).unwrap();
+    let setting_json: Value = serde_json::from_str(&s).unwrap();
 
-impl event::EventHandler<ggez::GameError> for Game {
-    fn update(&mut self, context: &mut Context) -> GameResult {
-        // Run input system
-        {
-            let mut is = InputSystem {};
-            is.run_now(&self.world);
-        }
+    let s= fs::read_to_string(GAME_DATA_PATH).unwrap();
+    let game_data_json: Value = serde_json::from_str(&s).unwrap();
 
-        // Run gameplay state system
-        {
-            let mut gss = GameplayStateSystem {};
-            gss.run_now(&self.world);
-        }
+    let context_builder = ggez::ContextBuilder::new(GAME_TITLE, AUTHOR)
+        .window_setup(conf::WindowSetup::default()
+            .title(GAME_TITLE)
+            .vsync(setting_json["vsync"].as_bool().unwrap()))
+        .window_mode(conf::WindowMode::default()
+            .dimensions(WINDOW_WIDTH, WINDOW_HEIGHT))
+        .add_resource_path(path::PathBuf::from(RESOURCE_PREFIX_PATH));
+    let (application_context, event_loop) = &mut context_builder.build()?;
 
-        // Get and update time resource
-        {
-            let mut time = self.world.write_resource::<Time>();
-            time.delta += timer::delta(context);
-        }
+    let mut game_context = GameContext::from(World::new());
+    game_context.register_components();
+    game_context.register_resources();
+    game_context.initialize_level(game_data_json["level"].as_u64().unwrap() as u8, application_context);
 
-        // Run event system
-        {
-            let mut es = EventSystem { context };
-            es.run_now(&self.world);
-        }
-
-        Ok(())
-    }
-
-    fn draw(&mut self, context: &mut Context) -> GameResult {
-        // Render game entities
-        {
-            let mut rs = RenderingSystem { context };
-            rs.run_now(&self.world);
-        }
-
-        Ok(())
-    }
-
-    fn key_down_event(
-        &mut self,
-        _context: &mut Context,
-        keycode: KeyCode,
-        _keymod: KeyMods,
-        _repeat: bool,
-    ) {
-        println!("Key pressed: {:?}", keycode);
-
-        let mut input_queue = self.world.write_resource::<InputQueue>();
-        input_queue.keys_pressed.push(keycode);
-    }
-}
-
-// Initialize the level
-pub fn initialize_level(world: &mut World) {
-    const MAP: &str = "
-    N N W W W W W N
-    W W W . . . W N
-    W BS P BB . . W N
-    W W W . BB BS W N 
-    W BS W W BB . W N
-    W . W . BS . W W
-    W BB BB BS BB BB BS W
-    W . . . BS . . W
-    W W W W W W W W
-    ";
-
-    load_map(world, MAP.to_string());
-}
-
-pub fn main() -> GameResult {
-    let mut world = World::new();
-    register_components(&mut world);
-    register_resources(&mut world);
-    initialize_level(&mut world);
-
-    // Create a game context and event loop
-    let context_builder = ggez::ContextBuilder::new("touhou_sokoban", "sokoban")
-        .window_setup(conf::WindowSetup::default().title("Touhou Sokoban!"))
-        .window_mode(conf::WindowMode::default().dimensions(1920.0, 1080.0))
-        .add_resource_path(path::PathBuf::from("./resources"));
-
-    let (mut context, event_loop) = context_builder.build()?;
-    initialize_sounds(&mut world, &mut context);
-
-    // Create the game state
-    let game = Game { world };
-    // Run the main event loop
-    event::run(context, event_loop, game)
+    event::run(application_context, event_loop, &mut game_context)
 }

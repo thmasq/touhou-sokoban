@@ -1,128 +1,112 @@
-use crate::components::*;
-use crate::constants::*;
-use crate::events::{EntityMoved, Event};
-use crate::resources::{EventQueue, Gameplay, InputQueue};
+use specs::{System, ReadStorage, Join, Entities, WriteStorage, WriteExpect};
+use crate::components::{Player, Position, Movable, Blocking, Renderable, Directional, Direction};
+use crate::resources::input_queue::InputQueue;
 use ggez::event::KeyCode;
-use specs::{world::Index, Entities, Join, ReadStorage, System, Write, WriteStorage};
-
+use crate::constant::{MAP_HEIGHT, MAP_WIDTH};
 use std::collections::HashMap;
+use crate::resources::game_state::GameState;
 
-pub struct InputSystem {}
 
-// System implementation
+type EntityIdMap = HashMap<(u8, u8), u32>;
+type IdVec = Vec<u32>;
+
+pub struct InputSystem;
+
+impl InputSystem {
+    pub fn new() -> Self {
+        InputSystem {}
+    }
+
+    fn handle_movement(&self, key: KeyCode, player_pos: &Position, movables: EntityIdMap, blockings: EntityIdMap) -> Option<IdVec> {
+        let (checking_range, is_horizontal) = match key {
+            KeyCode::Up => ((0..=player_pos.y).rev().collect::<Vec<_>>(), false),
+            KeyCode::Down => ((player_pos.y..=MAP_HEIGHT).collect::<Vec<_>>(), false),
+            KeyCode::Left => ((0..=player_pos.x).rev().collect::<Vec<_>>(), true),
+            KeyCode::Right => ((player_pos.x..=MAP_WIDTH).collect::<Vec<_>>(), true),
+            _ => return None
+        };
+
+        let mut to_move = Vec::new();
+
+        for idx in checking_range {
+            let pos = if is_horizontal { (idx, player_pos.y) } else { (player_pos.x, idx) };
+
+            match movables.get(&pos) {
+                Some(id) => to_move.push(*id),
+                None => {
+                    if let Some(_) = blockings.get(&pos) { to_move.clear(); }
+                    break;
+                }
+            }
+        }
+
+        Some(to_move)
+    }
+}
+
 impl<'a> System<'a> for InputSystem {
-    // Data
     type SystemData = (
-        Write<'a, EventQueue>,
-        Write<'a, InputQueue>,
-        Write<'a, Gameplay>,
+        WriteExpect<'a, InputQueue>,
+        WriteExpect<'a, GameState>,
         Entities<'a>,
-        WriteStorage<'a, Position>,
+        WriteStorage<'a, Renderable>,
+        WriteStorage<'a, Directional>,
         ReadStorage<'a, Player>,
         ReadStorage<'a, Movable>,
-        ReadStorage<'a, Immovable>,
+        ReadStorage<'a, Blocking>
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
-            mut events,
             mut input_queue,
-            mut gameplay,
+            mut game_state,
             entities,
-            mut positions,
-            players,
+            mut renderables,
+            mut directionals,
+            player,
             movables,
-            immovables,
+            blockings
         ) = data;
 
-        let mut to_move = Vec::new();
+        if let Some(key) = input_queue.pop() {
+            for(player_direction, _player) in (&mut directionals, &player).join() {
+                player_direction.direction = match key {
+                    KeyCode::Up => Direction::Up,
+                    KeyCode::Down => Direction::Down,
+                    KeyCode::Left => Direction::Left,
+                    KeyCode::Right => Direction::Right,
+                    _ => player_direction.direction
+                }
+            }
 
-        for (position, _player) in (&positions, &players).join() {
-            // Get the first key pressed
-            if let Some(key) = input_queue.keys_pressed.pop() {
-                // get all the movables and immovables
-                let mov: HashMap<(u8, u8), Index> = (&entities, &movables, &positions)
+            let mut to_move = None;
+            for (renderable_player, _player) in (&renderables, &player).join() {
+                let movables = (&entities, &movables, &renderables)
                     .join()
-                    .map(|t| ((t.2.x, t.2.y), t.0.id()))
+                    .map(|t| ((t.2.position.x, t.2.position.y), t.0.id()))
                     .collect::<HashMap<_, _>>();
-                let immov: HashMap<(u8, u8), Index> = (&entities, &immovables, &positions)
+                let blockings = (&entities, &blockings, &renderables)
                     .join()
-                    .map(|t| ((t.2.x, t.2.y), t.0.id()))
+                    .map(|t| ((t.2.position.x, t.2.position.y), t.0.id()))
                     .collect::<HashMap<_, _>>();
 
-                // Now iterate through current position to the end of the map
-                // on the correct axis and check what needs to move.
-                let (start, end, is_x) = match key {
-                    KeyCode::Up => (position.y, 0, false),
-                    KeyCode::Down => (position.y, MAP_HEIGHT, false),
-                    KeyCode::Left => (position.x, 0, true),
-                    KeyCode::Right => (position.x, MAP_WIDTH, true),
-                    KeyCode::W => (position.y, 0, false),
-                    KeyCode::S => (position.y, MAP_HEIGHT, false),
-                    KeyCode::A => (position.x, 0, true),
-                    KeyCode::D => (position.x, MAP_WIDTH, true),
-                    _ => continue,
-                };
+                to_move = self.handle_movement(key, &renderable_player.position, movables, blockings);
+            }
 
-                let range = if start < end {
-                    (start..=end).collect::<Vec<_>>()
-                } else {
-                    (end..=start).rev().collect::<Vec<_>>()
-                };
+            if let Some(to_move) = to_move {
+                if to_move.len() > 0 { game_state.moves_count += 1; }
 
-                for x_or_y in range {
-                    let pos = if is_x {
-                        (x_or_y, position.y)
-                    } else {
-                        (position.x, x_or_y)
-                    };
-
-                    // find a movable
-                    // if it exists, we try to move it and continue
-                    // if it doesn't exist, we continue and try to find an immovable instead
-                    match mov.get(&pos) {
-                        Some(id) => to_move.push((key, id.clone())),
-                        None => {
-                            // find an immovable
-                            // if it exists, we need to stop and not move anything
-                            // if it doesn't exist, we stop because we found a gap
-                            match immov.get(&pos) {
-                                Some(_id) => {
-                                    to_move.clear();
-                                    events.events.push(Event::PlayerHitObstacle {})
-                                }
-                                None => break,
-                            }
-                        }
+                for id in to_move {
+                    let renderable = renderables.get_mut(entities.entity(id)).unwrap();
+                    match key {
+                        KeyCode::Up => renderable.position.y -= 1,
+                        KeyCode::Down => renderable.position.y += 1,
+                        KeyCode::Left => renderable.position.x -= 1,
+                        KeyCode::Right => renderable.position.x += 1,
+                        _ => ()
                     }
                 }
             }
-        }
-
-        // We've just moved, so let's increase the number of moves
-        if to_move.len() > 0 {
-            gameplay.moves_count += 1;
-        }
-
-        // Now actually move what needs to be moved
-        for (key, id) in to_move {
-            let position = positions.get_mut(entities.entity(id));
-            if let Some(position) = position {
-                match key {
-                    KeyCode::Up => position.y -= 1,
-                    KeyCode::Down => position.y += 1,
-                    KeyCode::Left => position.x -= 1,
-                    KeyCode::Right => position.x += 1,
-                    KeyCode::W => position.y -= 1,
-                    KeyCode::S => position.y += 1,
-                    KeyCode::A => position.x -= 1,
-                    KeyCode::D => position.x += 1,
-                    _ => (),
-                }
-            }
-
-            // Fire an event for the entity that just moved
-            events.events.push(Event::EntityMoved(EntityMoved { id }));
         }
     }
 }

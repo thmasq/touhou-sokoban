@@ -1,24 +1,6 @@
 /target
-.vscode/tasks.json
-Release for windows/touhou-sokoban.exe
-Release for windows/resources/images/box_blue_1.png
-Release for windows/resources/images/box_blue_2.png
-Release for windows/resources/images/box_blue.png
-Release for windows/resources/images/box_red_1.png
-Release for windows/resources/images/box_red_2.png
-Release for windows/resources/images/box_red.png
-Release for windows/resources/images/box_spot_blue.png
-Release for windows/resources/images/box_spot_red.png
-Release for windows/resources/images/box_spot.png
-Release for windows/resources/images/box.png
-Release for windows/resources/images/floor.png
-Release for windows/resources/images/player_1.png
-Release for windows/resources/images/player_2.png
-Release for windows/resources/images/player_3.png
-Release for windows/resources/images/player.png
-Release for windows/resources/images/wall.png
-Release for windows/resources/sounds/correct.wav
-Release for windows/resources/sounds/incorrect.wav
-Release for windows/resources/sounds/wall.wav
-touhou-sokoban.exe
+.idea
+Cargo.lock
+.DS_Store
 touhou-sokoban
+touhou-sokoban.d

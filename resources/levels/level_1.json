@@ -1,0 +1,5 @@
+ {
+   "background_color": [160, 255, 255, 255],
+   "box_spot_identical_mode": false,
+   "map_string": "floor grass; 0,0; 0,1; 0,7; 1,3; 1,4; 1,5; 1,7; 2,1; 2,2; 2,3; 2,4; 2,5; 2,7; 3,3; 3,4; 3,5; 3,7; 4,1; 4,4; 4,5; 4,7; 5,1; 5,3; 5,4; 5,5; 6,1; 6,2; 6,3; 6,4; 6,5; 6,6; 7,1; 7,2; 7,3; 7,4; 7,5; 7,6\nspot black; 2,1; 3,5; 4,1; 5,4; 6,3; 6,6; 7,4\nwall horizontal-wall; 0,3; 0,4; 0,5; 1,1; 3,1; 8,1; 8,2; 8,3; 8,4; 8,5; 8,6\nwall upper-right-corner; 0,6; 3,2; 5,7\nwall upper-left-corner; 0,2; 1,0\nwall vertical-intersect-east; 3,0; 4,2\nwall vertical-end-south; 5,2\nwall horizontal-end-east; 4,3\nwall bottom-right-corner; 1,2; 8,7\nwall bottom-left-corner; 5,6; 8,0\nwall vertical-wall; 1,6; 2,0; 2,6; 3,6; 4,0; 4,6; 5,0;6,0; 6,7; 7,0; 7,7\nbox black; 2,3; 3,4; 4,4; 6,1; 6,3; 6,4; 6,5\nchar; 2,2"
+ }
