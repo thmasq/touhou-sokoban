@@ -38,4 +38,4 @@ I would also like to thank Thanh Nguyen and Ly Nguyen for sharing their source c
 
 #### Kazuki Kazuma 
 
-Lastly, I would like to thank Kazuki Kazuma, my friend, for taking some time to make the beautiful assets used in this game. We do intend to keep working together to make more complex assets once I have the skill to implement them in the game. Do check out his works: https://www.artstation.com/kazukikazuma https://www.instagram.com/wiesevictor/ 
+Lastly, I would like to thank Kazuki Kazuma, my friend, for lending me some of his time to make the beautiful assets used in this game. We do intend to keep working together to make more complex assets once I have the skill to implement them in the game. Do check out his works: https://www.artstation.com/kazukikazuma https://www.instagram.com/wiesevictor/ 
