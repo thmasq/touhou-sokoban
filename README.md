@@ -10,7 +10,7 @@
 
 #### Windows 
 
-Download the source code from the releases or from the repository itself if you want to run on the bleeding edge. Paste the windows binary inside that folder and run it. The binary must be in the root of the folder that contains the data and resources folders. You may delete the rest if you want to. Inside the data folder there is a file named game_data.json. It changes what level the game is going to load when you run the executable. Currently only level 1 and 2 are populated. 
+Download the source code from the releases or from the repository itself if you want to run on the bleeding edge. Paste the windows binary inside that folder and run it. The binary must be in the root of the folder that contains the data and resources folders. You may delete the rest if you want to. Inside the data folder there is a configuration file named game_data.json, which sets the level that will be generated. Currently only level 1 and 2 are populated, and program must be restarted for the level to be loaded. 
 
 #### Linux 
 
